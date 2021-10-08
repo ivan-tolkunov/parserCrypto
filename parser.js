@@ -1,9 +1,5 @@
 import fs from 'fs';
 
-
-//forms 0x99c2546Aebc070fB1F286a346Ec4D25e70533474
-//space 0x672C1f1C978b8FD1E9AE18e25D0E55176824989c
-
 let fileContent = fs.readFileSync(process.argv[2] + ".txt", "utf8");
 let writeableStream = fs.createWriteStream(process.argv[2] + " final.txt");
 let jsonArray = JSON.parse(fileContent);
@@ -54,6 +50,3 @@ function myCompare(a, b) {
 
 for(let el of finalArray.sort(myCompare))
     writeableStream.write(JSON.stringify(el) + " ");
-
-//if u need JSON
-// JSON.parse(JSON.stringify(finalArray))
