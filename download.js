@@ -2,9 +2,6 @@ import ethers from 'ethers';
 import axios from 'axios';
 import fs from 'fs';
 
-
-//forms 0x99c2546Aebc070fB1F286a346Ec4D25e70533474
-//space 0x672C1f1C978b8FD1E9AE18e25D0E55176824989c
 const daiAddress = process.argv[2];
 const provider = new ethers.providers.JsonRpcProvider("https://mainnet.infura.io/v3/c993cf87933b4dff8e015291a0320ccb");
 let writeableStream = fs.createWriteStream(daiAddress + ".txt");
