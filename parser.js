@@ -1,23 +1,19 @@
 import fs from 'fs';
 
-let fileContent = fs.readFileSync("json.txt", "utf8");
-const stringArray = fileContent.split("|");
-let writeableStream = fs.createWriteStream("finalString.txt");
-let jsonArray = [];
+
+//forms 0x99c2546Aebc070fB1F286a346Ec4D25e70533474
+//space 0x672C1f1C978b8FD1E9AE18e25D0E55176824989c
+
+let fileContent = fs.readFileSync(process.argv[2] + ".txt", "utf8");
+let writeableStream = fs.createWriteStream(process.argv[2] + " final.txt");
+let jsonArray = JSON.parse(fileContent);
 let attributeArray = [];
 let chanceArray = [];
 let finalArray = [];
 
-for(let element of stringArray) {
-    jsonArray.push(JSON.parse(element));
-}
-
 for(let attribute of jsonArray) {
-    attributeArray.push(attribute.attributes[0].value);
-    if(attribute.attributes[1] === undefined) {
-        attributeArray.push(false);
-    } else{
-        attributeArray.push(true);
+    for(let a of attribute.attributes) {
+        attributeArray.push(a.trait_type + ": " + a.value);
     }
 }
 
@@ -37,7 +33,7 @@ for (let key in result) {
 for (let el of jsonArray) {
     let finalChance = 1;
     for(let traitT of el.attributes) {
-        finalChance *= findChance(traitT.value);
+        finalChance *= findChance(traitT.trait_type + ": " + traitT.value);
     }
     const img = {
         name: el.name,
@@ -52,7 +48,11 @@ function findChance(traitType) {
     }
 }
 
-for(let el of finalArray)
+function myCompare(a, b) {
+    return a.chance - b.chance;
+  }
+
+for(let el of finalArray.sort(myCompare))
     writeableStream.write(JSON.stringify(el) + " ");
 
 //if u need JSON
