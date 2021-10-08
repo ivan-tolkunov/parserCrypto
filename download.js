@@ -24,6 +24,6 @@ for (let i = 1; i <= length; i++) {
     const myObject = {
         name, attributes
     }
-    writeableStream.write(JSON.stringify(myObject));
+    writeableStream.write(JSON.stringify(myObject) + "|");
 }
 writeableStream.end("END");
