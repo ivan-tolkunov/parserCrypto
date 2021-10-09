@@ -1,5 +1,6 @@
 import ethers from 'ethers';
 import axios from 'axios';
+import axiosRetry from 'axios-retry';
 import fs from 'fs';
 
 const daiAddress = process.argv[2];
@@ -11,8 +12,9 @@ const daiAbi =
 
 const daiContract = new ethers.Contract(daiAddress, daiAbi, provider);
 
-async function getInfo(index) {
-    const url = await daiContract.tokenURI(index);
+async function getInfo(i) {
+    const index = await daiContract.tokenByIndex(i);
+    const url = await daiContract.tokenURI(parseInt(index._hex, 16));
     const response = await axios.get(url);
     return response.data;
 }
@@ -22,7 +24,7 @@ let downloadedArray = [];
 
 let boost = 20;
 let step = (length - 1) / boost;
-let start = 1;
+let start = 0;
 let end = start + step;
 
 for(let i = 0; i < boost; i++) {
@@ -33,13 +35,24 @@ for(let i = 0; i < boost; i++) {
 
 async function treadRead(from, to) {
     for (let i = from; i <= to; i++) {
-        const {name, attributes} = await getInfo(i);
-        console.log(name);
-        const myObject = {
-            name, attributes
-        }
-        downloadedArray.push(myObject);
+        try {
+            const {name, attributes} = await getInfo(i);
+                console.log(name);
+                const myObject = {
+                    name, attributes
+                }
+                downloadedArray.push(myObject);
+          } catch (e) {
+            const {name, attributes} = await getInfo(i);
+                const myObject = {
+                    name, attributes
+                }
+                console.log(myObject.attributes[0])
+                downloadedArray.push(myObject);
+          }
     }
-    writeableStream.write(JSON.stringify(downloadedArray));
-    writeableStream.end("");
+    if(downloadedArray.length === length) {
+        writeableStream.write(JSON.stringify(downloadedArray));
+        writeableStream.end("");
+    }
 }
