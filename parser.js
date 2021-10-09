@@ -2,13 +2,16 @@ import fs from 'fs';
 
 let fileContent = fs.readFileSync(process.argv[2] + ".txt", "utf8");
 let writeableStream = fs.createWriteStream(process.argv[2] + " final.txt");
-let jsonArray = JSON.parse(fileContent);
+
+let simpleArray = fileContent.split("|").splice(-1,1);
+let deleteLastElement = simpleArray.pop();
+let jsonArray = JSON.parse(JSON.stringify(simpleArray));
 let attributeArray = [];
 let chanceArray = [];
 let finalArray = [];
 
 for(let attribute of jsonArray) {
-    for(let a of attribute.attributes) {
+    for(let a of JSON.parse(attribute).attributes) {
         attributeArray.push(a.trait_type + ": " + a.value);
     }
 }
@@ -28,11 +31,11 @@ for (let key in result) {
 
 for (let el of jsonArray) {
     let finalChance = 1;
-    for(let traitT of el.attributes) {
+    for(let traitT of JSON.parse(el).attributes) {
         finalChance *= findChance(traitT.trait_type + ": " + traitT.value);
     }
     const img = {
-        name: el.name,
+        name: JSON.parse(el).name,
         chance: finalChance
     };
    finalArray.push(img);
@@ -50,3 +53,5 @@ function myCompare(a, b) {
 
 for(let el of finalArray.sort(myCompare))
     writeableStream.write(JSON.stringify(el) + " ");
+    
+writeableStream.end("");
